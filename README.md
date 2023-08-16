@@ -1,6 +1,7 @@
 # code_postal
 
-## Fonctionnement :
+## Lancement du programme :
 
-projet Django du nom de codetest avec une app codepostal. 
+
+
 

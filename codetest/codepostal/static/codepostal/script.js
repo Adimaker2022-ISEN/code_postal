@@ -6,55 +6,51 @@ function reset(){
 
 function searchCommune() {
 
-// Récupération du code postal
-  let zip = document.getElementById("zipInput").value;
-  // Création de la requète http
+// Référence au champ de saisie du code postal
+let zipInput = document.getElementById("zipInput");
+    
+// Référence à la liste ul
+let communeList = document.getElementById("communeList");
+
+// Référence à l'élément pour afficher le résultat
+let result = document.getElementById("result");
+
+// Ajout de l'événement oninput sur le champ de saisie
+zipInput.addEventListener("input", function() {
+  // Récupération du code postal saisi
+  let zip = zipInput.value;
+  
+  // Création de la requête HTTP
   let xhr = new XMLHttpRequest();
   xhr.open("GET", "https://api.zippopotam.us/fr/" + zip, true);
   
-  // Gestion de la réponse de L'api
+  // Gestion de la réponse de l'API
   xhr.onreadystatechange = function() {
-    // si la réponse est prête et que le code de retour est 200 (OK)
+    // Si la réponse est prête et que le statut est OK
     if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-        // conversion de la réponse en objet js
+      // Conversion des données de réponse en objet JavaScript
       let data = JSON.parse(xhr.responseText);
       let places = data.places;
       
-      // si il n'y a qu'une commune
-      if (places.length === 1) {
-        // affichage de la commune
-        let result = "Commune trouvée : " + places[0]["place name"];
-        document.getElementById("result").innerHTML = result;
-        // si il y a plusieurs communes
-      } else {
-        // affichage de la liste déroulante
-        let select = document.getElementById("communeSelect");
-        select.style.display = "block";
-        select.innerHTML = "";
-
-        // ajout des communes dans la liste déroulante
-        for (let i = 0; i < places.length; i++) {
-          let option = document.createElement("option");
-          option.value = places[i]["place name"];
-          option.text = places[i]["place name"];
-          select.appendChild(option);
-        }
+      // Effacement des options précédentes
+      while (communeList.firstChild) {
+        communeList.removeChild(communeList.firstChild);
+      }
+      
+      // Ajout d'une option pour chaque commune
+      for (let i = 0; i < places.length; i++) {
+        let li = document.createElement("li");
+        li.textContent = places[i]["place name"];
+        li.addEventListener("click", function() {
+          result.textContent = "Vous avez sélectionné " + li.textContent;
+        });
+        communeList.appendChild(li);
       }
     }
-    else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
-        // affichage de l'erreur
-        let result = "Aucune commune trouvée pour le code postal " + zip;
-        document.getElementById("result").innerHTML = result;
-    }
   };
-
-  // envoi de la requète
+  
+  // Envoi de la requête
   xhr.send();
-
-  // gestion du changement de commune dans la liste déroulante
-    document.getElementById("communeSelect").addEventListener("change", function() {
-    let result = "Commune choisie : " + this.value;
-    document.getElementById("result").innerHTML = result;
-  });
+});
 }
 
